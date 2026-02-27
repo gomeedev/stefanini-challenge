@@ -4,4 +4,15 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "asgiref>=3.11.1",
+    "django>=6.0.2",
+    "django-extensions>=4.1",
+    "djangorestframework>=3.16.1",
+    "drf-spectacular>=0.29.0",
+    "mysqlclient>=2.2.8",
+    "pillow>=12.1.1",
+    "pymysql>=1.1.2",
+    "sqlparse>=0.5.5",
+    "tzdata>=2025.3",
+]
