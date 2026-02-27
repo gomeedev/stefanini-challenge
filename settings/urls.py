@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from user import urls
 
 
 
@@ -27,5 +26,7 @@ urlpatterns = [
     # urls of user
     path('users/', include('user.urls')),
     
+    # urls of tasks
+    path('tasks/', include('tasks.urls')),
     
 ]
