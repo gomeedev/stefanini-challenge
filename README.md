@@ -23,5 +23,7 @@ validaciones
 flujo de estados
 
 
+Anotaciones para no olvidar
 explicar que todas la aruiqtectura usada es la nativa de django
 explicar que todas las app manejan la misma estructura
+mencionar que ya django internamente maneja validacion de campos, entre ellos: email
