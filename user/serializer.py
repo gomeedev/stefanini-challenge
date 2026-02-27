@@ -3,6 +3,7 @@ from .services import create_user
 
 
 
+
 class CreateUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField(max_length=20)

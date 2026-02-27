@@ -3,6 +3,7 @@ from .models import User
 
 
 
+
 # Harold, no validé formato de correo porque django internamente ya lo hace
 def create_user(email:str, first_name:str, last_name:str):
     if User.objects.filter(email=email).exists():
