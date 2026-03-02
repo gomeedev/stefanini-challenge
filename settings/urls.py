@@ -26,10 +26,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # urls of user
-    path('users/', include('user.urls')),
+    path('api/v1/users/', include('user.urls')),
     
     # urls of tasks
-    path('tasks/', include('tasks.urls')),
+    path('api/v1/tasks/', include('tasks.urls')),
     
     # urls of the assistant
     path('api/v1/assistant/', include('assistant.urls')),

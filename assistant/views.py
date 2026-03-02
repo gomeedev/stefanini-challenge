@@ -2,11 +2,39 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+
 from .services import AssistantService
 
 
 
 
+
+@extend_schema(
+    tags=["Alex"],
+    summary="Consultar al asistente",
+    description="Este endpoint es para interactuar con el asistente de IA, mantiene historial por session_id.",
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "pregunta":   {"type": "string", "example": "¿Quién soy?"},
+                "session_id": {"type": "string", "example": "sesion-1"},
+                "user_id":    {"type": "integer", "example": 2},
+            },
+            "required": ["pregunta", "session_id"]
+        }
+    },
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "pregunta":  {"type": "string"},
+                "respuesta": {"type": "string"},
+            }
+        }
+    }
+)
 @api_view(['POST'])
 def consult_assistan(request):
     
