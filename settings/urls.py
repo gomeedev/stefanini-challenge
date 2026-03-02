@@ -31,6 +31,9 @@ urlpatterns = [
     # urls of tasks
     path('tasks/', include('tasks.urls')),
     
+    # urls of the assistant
+    path('api/v1/assistant/', include('assistant.urls')),
+    
     # swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
