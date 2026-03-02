@@ -100,6 +100,42 @@ modelos de request/response y ejemplos. La configuración se encuentra en
 `settings/settings.py`, y el esquema se genera a partir de los viewsets/funciones
 registrados en `urls.py`.
 
+## Alex
+
+El proyecto integra **Alex**, un asistente inteligente impulsado por [Groq](https://groq.com) y el modelo `llama-3.3-70b-versatile`, capaz de responder preguntas sobre el sistema, los usuarios y sus tareas asignadas.
+
+> [!NOTE]
+> Para usar el asistente necesitas una `GROQ_API_KEY` válida configurada en tu archivo `.env`.
+> Puedes obtener una gratis en [https://console.groq.com/keys](https://console.groq.com).
+
+### Endpoint
+```
+POST /api/v1/assistant/consult/
+```
+
+### Body
+```json
+{
+    "pregunta": "¿Quién soy y qué tareas tengo?",
+    "session_id": "sesion-1",
+    "user_id": 2
+}
+```
+
+> [!IMPORTANT]
+> El `session_id` es clave para el historial de conversación. Usa el mismo identificador en todas las preguntas de una misma sesión. Si cambias el `session_id`, la conversación empieza desde cero.
+
+> [!WARNING]
+> El historial se almacena en memoria RAM del servidor. Si el servidor se reinicia, las sesiones se pierden. Esto es intencional porque no se definio en la BD.
+
+### Response
+```json
+{
+    "pregunta": "¿Quién soy, qué tareas tengo y que pregunte anteriormente?",
+    "respuesta": "Eres Johann..."
+}
+```
+
 ## Arquitectura
 
 El proyecto sigue la arquitectura **MVT** (Model‑View‑Template) nativa de Django.
