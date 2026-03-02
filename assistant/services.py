@@ -2,9 +2,10 @@ from groq import Groq
 from django.conf import settings
 
 from user.models import User
-from tasks.models import StatusChoice, Task
+from tasks.models import Task
 
 
+_historial_store = {}
 
 
 # Servicio para manejar consultas con Groq
@@ -15,34 +16,53 @@ class AssistantService:
         self.model = "llama-3.3-70b-versatile"
         
         
-    def get_context(self):
-        total_users = User.objects.count()
-        total_task = Task.objects.count()
+    def get_context(self, user_id=None):
         
-        context = "Contexto de la aplicación de tareas con colaboración"
+        context = "CONTEXTO DEL SISTEMA: \n"
         
-        context += f"Total de usuarios: {total_users}"
-        context += f"Total de tareas: {total_task}"
+        if user_id:
+            try:
+                user = User.objects.prefetch_related('tasks').get(id=user_id)
+                context += f"usuario actual:\n"
+                context += f"- Nombre: {user.first_name} {user.last_name}\n"
+                context += f"- Correo: {user.email}\n"
+
+                tasks = user.tasks.all()
+                context += f"Tareas asignadas: ({tasks.count()}):\n"
+                for task in tasks:
+                    context += f"  · [{task.status}] {task.title}\n"
+                    if task.description:
+                        context += f"    Descripción: {task.description}\n"
+
+            except User.DoesNotExist:
+                context += "El usuario con ese id no existe.\n"
+                
+    
+        context += "Resumen general: "    
+        context += f"Totao de usuarios {User.objects.count()}"
+        context += f"Total de tareas {Task.objects.count()}"
         
         return context
         
     
-    def consult(self, user_question):
-        data_context = self.get_context()
+    def consult(self, session_id, user_question, user_id=None):
         
-        prompt_system = """Eres **Alex**, un asistente y Análista inteligente que facilita la gestión de tareas para los usuarios, tu misión es permitirles gestionar mejor su flujo de trabajo con guias y enseñanzas practicas.
+        history = _historial_store.get(session_id, [])
+        
+        
+        data_context = self.get_context(user_id=user_id)
+        prompt_system = f"""Eres **Alex**, un asistente y Análista inteligente que facilita la gestión de tareas para los usuarios, tu misión es permitirles gestionar mejor su flujo de trabajo con guias y enseñanzas practicas.
         
         REGLAS IMPORTANTES:
         1. Solo puedes responder con preguntas basadas en el contexto proporcionado, evitar dar información falsa y/o alucinar.
         2. Si no tienes la información o no puedes responder una pregunta, se honesto y aclara que no tienes información suficiente para esa pregunta.
         3. Nos gusta la argumentación y la ciencia. Por ende, trata de explicar todo con profundidad y la razón de tus decisiones.
-        4. Saluda al equipo (Harold, Jessica, Sara, jennifer y Saira) al final del texto (hazlo con poco margén por respuesta, para evitar que todos los ouputs muestren el saludo). 
+        4. Ocasionalmente, dinos un dato curioso sobre la computación y áreas afines a esta, datos muy profundos que nos incentiven a pensar y/o reflexionar. 
         
         
         Contexto actual del sistema: \n\n:
+        {data_context}
         """
-        
-        prompt_system += data_context
         
         mesagges = [
             {
@@ -50,6 +70,8 @@ class AssistantService:
                 "content": prompt_system
             }
         ]
+        
+        mesagges.extend(history)
         
         mesagges.append({
             "role": "user",
@@ -66,15 +88,23 @@ class AssistantService:
             
             response = chat_completion.choices[0].message.content
             
-            mesagges.append({
+            history.append({
+                "role": "user",
+                "content": user_question
+            })
+            
+            history.append({
                 "role": "assistant",
                 "content": response
             })
             
+            _historial_store[session_id] = history
+            
             return {
                 "success": True,
-                "respuesta": response
+                "respuesta": response,
             }
+            
         except Exception as e:
             return {
                 "succes": False,
